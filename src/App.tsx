@@ -1,26 +1,102 @@
-/* eslint-disable max-len */
-/* eslint-disable jsx-a11y/control-has-associated-label */
-import React from 'react';
-import { UserWarning } from './UserWarning';
+/* eslint-disable jsx-a11y/label-has-associated-control */
 
-const USER_ID = 0;
+import React, { useEffect, useState } from 'react';
+import { UserWarning } from './UserWarning';
+import { getTodos } from './api/todos';
+import { FilterStatus, ErrorMessages } from './types';
+import { Todo, USER_ID } from './types';
+import { TodoHeader } from './components/TodoHeader';
+import { TodoFooter } from './components/TodoFooter';
+import { TodoList } from './components/TodoList';
+import { filterTodos } from './utils/fiterTodos';
+import { ErrorNotification } from './components/ErrorNotification';
 
 export const App: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [preparedTodos, setPreparedTodos] = useState<Todo[]>([]);
+  const [activeFilterStatus, setActiveFilterStatus] = useState<FilterStatus>(
+    FilterStatus.All,
+  );
+  const [currentError, setCurrentError] = useState<ErrorMessages | ''>('');
+
+  const handleHideError = (): void => {
+    setCurrentError('');
+  };
+
+  useEffect(() => {
+    const loadTodos = async () => {
+      try {
+        setIsLoading(true);
+        const data: Todo[] = await getTodos();
+
+        setPreparedTodos(data);
+      } catch (error) {
+        setCurrentError(ErrorMessages.Load);
+        setTimeout(() => {
+          handleHideError();
+        }, 3000);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTodos();
+  }, [currentError]);
+
   if (!USER_ID) {
     return <UserWarning />;
   }
 
-  return (
-    <section className="section container">
-      <p className="title is-4">
-        Copy all you need from the prev task:
-        <br />
-        <a href="https://github.com/mate-academy/react_todo-app-loading-todos#react-todo-app-load-todos">
-          React Todo App - Load Todos
-        </a>
-      </p>
+  const filteredTodos = filterTodos(preparedTodos, activeFilterStatus);
 
-      <p className="subtitle">Styles are already copied</p>
-    </section>
+  const handleChangeFilter = (type: FilterStatus) => {
+    setActiveFilterStatus(type);
+  };
+
+  const handleCheckTodo = (id: number) => {
+    setPreparedTodos(prev =>
+      prev.map(todo =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
+  };
+
+  const quantityActiveTasks = (): number => {
+    return preparedTodos.filter(todo => !todo.completed).length;
+  };
+
+  return (
+    <div className="todoapp">
+      <h1 className="todoapp__title">todos</h1>
+
+      <div className="todoapp__content">
+        <TodoHeader
+          quantityActiveTasks={quantityActiveTasks()}
+          todos={preparedTodos}
+          loadingTodos={[]}
+        />
+
+        <TodoList
+          filteredTodos={filteredTodos}
+          handleCheckTodo={handleCheckTodo}
+          isLoading={isLoading}
+        />
+
+        {preparedTodos.length > 0 && (
+          <TodoFooter
+            todos={preparedTodos}
+            quantityActiveTasks={quantityActiveTasks()}
+            activeFilterStatus={activeFilterStatus}
+            handleChangeFilter={handleChangeFilter}
+            handleDeleteAllTodos={() => setPreparedTodos([])}
+          />
+        )}
+      </div>
+
+      <ErrorNotification
+        currentError={currentError}
+        handleHideError={handleHideError}
+      />
+    </div>
   );
 };
