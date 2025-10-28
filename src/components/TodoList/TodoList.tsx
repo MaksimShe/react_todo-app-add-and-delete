@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { Todo } from '../../types';
 import cn from 'classnames';
+import * as React from 'react';
 
-export type Props = {
+type Props = {
   filteredTodos: Todo[];
   handleCheckTodo: (id: number) => void;
   isLoading: boolean;

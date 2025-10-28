@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { UserWarning } from './UserWarning';
 import { getTodos } from './api/todos';
 import { FilterStatus, ErrorMessages } from './types';

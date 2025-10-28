@@ -1,7 +1,8 @@
 import cn from 'classnames';
 import { FilterStatus, Todo } from '../../types';
+import * as React from 'react';
 
-export type Props = {
+type Props = {
   todos: Todo[];
   quantityActiveTasks: number;
   activeFilterStatus: string;
