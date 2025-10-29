@@ -13,7 +13,8 @@ import { filterTodos } from './utils/fiterTodos';
 import { ErrorNotification } from './components/ErrorNotification';
 
 export const App: React.FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(null);
+  const [idTodoLoading, setIdTodoLoading] = useState<number>(-1);
   const [preparedTodos, setPreparedTodos] = useState<Todo[]>([]);
   const [activeFilterStatus, setActiveFilterStatus] = useState<FilterStatus>(
     FilterStatus.All,
@@ -48,6 +49,22 @@ export const App: React.FC = () => {
     return <UserWarning />;
   }
 
+  const activateTempTodo = tempTodo => {
+    setPreparedTodos(prev => [...prev, { ...tempTodo, id: 0 }]);
+  };
+
+  const deleteTempTodo = () => {
+    setPreparedTodos(prev => prev.filter(todo => todo.id !== 0));
+  };
+
+  const addTodoOnScreen = (todo: Todo) => {
+    setPreparedTodos(prev => [...prev, { ...todo }]);
+  };
+
+  const deleteTodoOnScreen = (id: number) => {
+    setPreparedTodos(prev => prev.filter(todo => todo.id !== id));
+  };
+
   const filteredTodos = filterTodos(preparedTodos, activeFilterStatus);
 
   const handleChangeFilter = (type: FilterStatus) => {
@@ -63,7 +80,8 @@ export const App: React.FC = () => {
   };
 
   const quantityActiveTasks = (): number => {
-    return preparedTodos.filter(todo => !todo.completed).length;
+    return preparedTodos.filter(todo => !todo.completed && todo.id !== 0)
+      .length;
   };
 
   return (
@@ -75,12 +93,24 @@ export const App: React.FC = () => {
           quantityActiveTasks={quantityActiveTasks()}
           todos={preparedTodos}
           loadingTodos={[]}
+          handleAddTodo={addTodoOnScreen}
+          handleError={setCurrentError}
+          isLoading={isLoading}
+          handleIdTodoLoading={setIdTodoLoading}
+          handleSetLoading={setIsLoading}
+          hanleActivateTempTodo={activateTempTodo}
+          hanleDeleteTempTodo={deleteTempTodo}
         />
 
         <TodoList
           filteredTodos={filteredTodos}
           handleCheckTodo={handleCheckTodo}
           isLoading={isLoading}
+          handleLoading={setIsLoading}
+          deleteTodo={deleteTodoOnScreen}
+          idTodoLoading={idTodoLoading}
+          handleSetIdLoading={setIdTodoLoading}
+          handleError={setCurrentError}
         />
 
         {preparedTodos.length > 0 && (

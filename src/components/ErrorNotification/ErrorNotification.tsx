@@ -10,6 +10,10 @@ export const ErrorNotification: React.FC<Props> = ({
   currentError,
   handleHideError,
 }) => {
+  setTimeout(() => {
+    handleHideError();
+  }, 3000);
+
   return (
     <div
       data-cy="ErrorNotification"
