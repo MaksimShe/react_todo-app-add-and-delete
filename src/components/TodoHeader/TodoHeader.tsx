@@ -7,35 +7,36 @@ import { useAddTodo } from '../../hooks/useAddTodo';
 type Props = {
   quantityActiveTasks: number;
   preparedTodos: Todo[];
-  loadingTodos: number[];
-  handleError: (error: ErrorMessages) => void;
-  isLoading: boolean;
-  handleIdTodoLoading: (id: number[]) => void;
-  handleSetLoading: (loading: boolean) => void;
-  handlePreparedTodos: (todos: Todo[]) => void;
+  isDisabledInput: boolean;
   inputRef;
+
+  handleError: (error: ErrorMessages) => void;
+  handleIdTodoLoading: (id: number[]) => void;
+  handleSetDisableInput: (loading: boolean) => void;
+  handlePreparedTodos: (todos: Todo[]) => void;
 };
 
 export const TodoHeader: React.FC<Props> = ({
   quantityActiveTasks,
   preparedTodos,
-  handleError,
-  isLoading,
-  handleIdTodoLoading,
-  handleSetLoading,
-  handlePreparedTodos,
+  isDisabledInput,
   inputRef,
+
+  handleError,
+  handleIdTodoLoading,
+  handleSetDisableInput,
+  handlePreparedTodos,
 }) => {
-  const { inputText, setInputText, handleSubmit } = useAddTodo(
+  const { inputText, setInputText, handleSubmit } = useAddTodo({
     handleError,
     handleIdTodoLoading,
-    handleSetLoading,
+    handleSetDisableInput,
     handlePreparedTodos,
-  );
+  });
 
   useEffect(() => {
     inputRef.current.focus();
-  }, [inputRef, isLoading]);
+  }, [inputRef, isDisabledInput]);
 
   return (
     <header className="todoapp__header">
@@ -58,7 +59,7 @@ export const TodoHeader: React.FC<Props> = ({
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
           onChange={e => setInputText(e.target.value)}
-          disabled={isLoading}
+          disabled={isDisabledInput}
         />
       </form>
     </header>

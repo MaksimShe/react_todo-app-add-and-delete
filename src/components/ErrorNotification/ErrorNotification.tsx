@@ -1,17 +1,18 @@
 import classNames from 'classnames';
 import * as React from 'react';
+import { ErrorMessages } from '../../types';
 
 type Props = {
   currentError: string | null;
-  handleHideError: () => void;
+  handleError: (errorType: ErrorMessages) => void;
 };
 
 export const ErrorNotification: React.FC<Props> = ({
   currentError,
-  handleHideError,
+  handleError,
 }) => {
   setTimeout(() => {
-    handleHideError();
+    handleError(ErrorMessages.WithoutError);
   }, 3000);
 
   return (
@@ -26,7 +27,7 @@ export const ErrorNotification: React.FC<Props> = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={handleHideError}
+        onClick={() => handleError(ErrorMessages.WithoutError)}
       />
       {currentError}
     </div>

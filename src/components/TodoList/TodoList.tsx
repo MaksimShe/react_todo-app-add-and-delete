@@ -8,23 +8,23 @@ import { useDeleteTodos } from '../../hooks/useDeleteTodo';
 type Props = {
   filteredTodos: Todo[];
   handleCheckTodo: (id: number) => void;
-  idTodoLoading: number[];
+  todoIdLoading: number[];
   handleSetIdLoading: (id: number[]) => void;
-  handleError(error: ErrorMessages);
+  handleSetError(error: ErrorMessages);
   handlePreparedTodos: (todos: Todo[]) => void;
 };
 
 export const TodoList: React.FC<Props> = ({
-  filteredTodos,
-  handleCheckTodo,
-  idTodoLoading,
-  handleSetIdLoading,
-  handleError,
-  handlePreparedTodos,
+  filteredTodos, //use
+  todoIdLoading, //jsx
+  handleCheckTodo, //jsx
+  handleSetIdLoading, //use
+  handleSetError, //use
+  handlePreparedTodos, //use
 }) => {
   const { handleDeleteTodos } = useDeleteTodos(
     handlePreparedTodos, //setPreparedTodos
-    handleError, // setCurrentError
+    handleSetError, // setCurrentError
     handleSetIdLoading, //setTodoIdLoad
     filteredTodos, //todos
   );
@@ -52,7 +52,6 @@ export const TodoList: React.FC<Props> = ({
               {todo.title}
             </span>
 
-            {/* Remove button appears only on hover */}
             <button
               type="button"
               className="todo__remove"
@@ -62,11 +61,10 @@ export const TodoList: React.FC<Props> = ({
               ×
             </button>
 
-            {/* overlay will cover the todo while it is being deleted or updated */}
             <div
               data-cy="TodoLoader"
               className={cn('modal overlay', {
-                'is-active': idTodoLoading.includes(todo.id),
+                'is-active': todoIdLoading.includes(todo.id),
               })}
             >
               <div className="modal-background has-background-white-ter" />

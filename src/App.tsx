@@ -13,33 +13,28 @@ import { filterTodos } from './utils/fiterTodos';
 import { ErrorNotification } from './components/ErrorNotification';
 
 export const App: React.FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(null);
+  const [isDisabledInput, setDisableInput] = useState<boolean>(null);
   const [idTodoLoading, setIdTodoLoading] = useState<number[]>([]);
   const [preparedTodos, setPreparedTodos] = useState<Todo[]>([]);
   const [activeFilterStatus, setActiveFilterStatus] = useState<FilterStatus>(
     FilterStatus.All,
   );
-  const [currentError, setCurrentError] = useState<ErrorMessages | ''>('');
+  const [currentError, setCurrentError] = useState<ErrorMessages>(
+    ErrorMessages.WithoutError,
+  );
   const inputRef = useRef<HTMLInputElement>();
-
-  const handleHideError = (): void => {
-    setCurrentError('');
-  };
 
   useEffect(() => {
     const loadTodos = async () => {
       try {
-        setIsLoading(true);
+        setDisableInput(true);
         const data: Todo[] = await getTodos();
 
         setPreparedTodos(data);
       } catch (error) {
         setCurrentError(ErrorMessages.Load);
-        setTimeout(() => {
-          handleHideError();
-        }, 3000);
       } finally {
-        setIsLoading(false);
+        setDisableInput(false);
       }
     };
 
@@ -51,10 +46,6 @@ export const App: React.FC = () => {
   }
 
   const filteredTodos = filterTodos(preparedTodos, activeFilterStatus);
-
-  const handleChangeFilter = (type: FilterStatus) => {
-    setActiveFilterStatus(type);
-  };
 
   const handleCheckTodo = (id: number) => {
     setPreparedTodos(prev =>
@@ -108,21 +99,20 @@ export const App: React.FC = () => {
         <TodoHeader
           quantityActiveTasks={quantityActiveTasks()}
           preparedTodos={preparedTodos}
-          loadingTodos={[]}
-          handleError={setCurrentError}
-          isLoading={isLoading}
-          handleIdTodoLoading={setIdTodoLoading}
-          handleSetLoading={setIsLoading}
+          isDisabledInput={isDisabledInput}
           inputRef={inputRef}
+          handleError={setCurrentError}
+          handleIdTodoLoading={setIdTodoLoading}
+          handleSetDisableInput={setDisableInput}
           handlePreparedTodos={setPreparedTodos}
         />
 
         <TodoList
           filteredTodos={filteredTodos}
+          todoIdLoading={idTodoLoading}
           handleCheckTodo={handleCheckTodo}
-          idTodoLoading={idTodoLoading}
           handleSetIdLoading={setIdTodoLoading}
-          handleError={setCurrentError}
+          handleSetError={setCurrentError}
           handlePreparedTodos={setPreparedTodos}
         />
 
@@ -131,7 +121,7 @@ export const App: React.FC = () => {
             todos={preparedTodos}
             quantityActiveTasks={quantityActiveTasks()}
             activeFilterStatus={activeFilterStatus}
-            handleChangeFilter={handleChangeFilter}
+            handleChangeFilter={setActiveFilterStatus}
             handleDeleteAllTodos={() => deleteAllCompletedTodos()}
           />
         )}
@@ -139,7 +129,7 @@ export const App: React.FC = () => {
 
       <ErrorNotification
         currentError={currentError}
-        handleHideError={handleHideError}
+        handleError={setCurrentError}
       />
     </div>
   );

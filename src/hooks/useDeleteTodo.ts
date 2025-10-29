@@ -3,32 +3,32 @@ import { deleteTodos } from '../api/todos';
 import { ErrorMessages, Todo } from '../types';
 
 export const useDeleteTodos = (
-  setPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>,
-  setCurrentError: (error: ErrorMessages | '') => void,
-  setTodoIdLoading: Dispatch<SetStateAction<number[]>>,
-  todos: Todo[],
+  handleSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>,
+  handleSetCurrentError: (error: ErrorMessages) => void,
+  handleSetTodoIdLoading: Dispatch<SetStateAction<number[]>>,
+  filteredTodos: Todo[],
 ) => {
-  const completedTodos = todos.filter(todo => todo.completed);
+  const completedTodos = filteredTodos.filter(todo => todo.completed);
 
   const handleDeleteTodos = async (id: number) => {
     try {
-      setTodoIdLoading([id]);
+      handleSetTodoIdLoading([id]);
       await deleteTodos(id);
-      setPreparedTodos(prev => prev.filter(todo => todo.id !== id));
+      handleSetPreparedTodos(prev => prev.filter(todo => todo.id !== id));
     } catch (err) {
-      setCurrentError(ErrorMessages.Delete);
+      handleSetCurrentError(ErrorMessages.Delete);
       setTimeout(() => {
-        setCurrentError(ErrorMessages.WithoutError);
+        handleSetCurrentError(ErrorMessages.WithoutError);
       }, 3000);
     } finally {
-      setTodoIdLoading([]);
+      handleSetTodoIdLoading([]);
     }
   };
 
   const handleDeleteAllCompletedTodos = async () => {
     const completedIds = completedTodos.map(todo => todo.id);
 
-    setTodoIdLoading(completedIds);
+    handleSetTodoIdLoading(completedIds);
 
     try {
       const results = await Promise.allSettled(
@@ -39,18 +39,21 @@ export const useDeleteTodos = (
         (_, index) => results[index].status === 'fulfilled',
       );
 
-      setPreparedTodos(prev =>
+      handleSetPreparedTodos(prev =>
         prev.filter(todo => !successfulIds.includes(todo.id)),
       );
 
       const hasError = results.some(r => r.status === 'rejected');
 
       if (hasError) {
-        setCurrentError(ErrorMessages.Delete);
-        setTimeout(() => setCurrentError(ErrorMessages.WithoutError), 3000);
+        handleSetCurrentError(ErrorMessages.Delete);
+        setTimeout(
+          () => handleSetCurrentError(ErrorMessages.WithoutError),
+          3000,
+        );
       }
     } finally {
-      setTodoIdLoading([]);
+      handleSetTodoIdLoading([]);
     }
   };
 
