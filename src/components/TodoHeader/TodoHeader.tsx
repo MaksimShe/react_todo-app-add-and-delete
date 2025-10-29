@@ -1,11 +1,8 @@
-/* eslint-disable no-console */
 import cn from 'classnames';
-import { ErrorMessages, Todo, USER_ID } from '../../types';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { addTodos } from '../../api/todos';
-
-//i will refactor this piece of shit
+import { useEffect } from 'react';
+import { ErrorMessages, Todo } from '../../types';
+import { useAddTodo } from '../../hooks/useAddTodo';
 
 type Props = {
   quantityActiveTasks: number;
@@ -33,65 +30,18 @@ export const TodoHeader: React.FC<Props> = ({
   hanleDeleteTempTodo,
   inputRef,
 }) => {
-  const [inputText, setInputText] = useState<string>('');
-
-  const handleSubmit = async event => {
-    event.preventDefault();
-
-    if (!inputText.trim()) {
-      handleError(ErrorMessages.EmptyTitle);
-
-      return;
-    }
-
-    const newTodo: Todo = {
-      id: 0,
-      userId: USER_ID,
-      title: inputText.trim(),
-      completed: false,
-    };
-
-    console.log(newTodo);
-
-    handleSetLoading(true);
-    hanleActivateTempTodo(newTodo);
-    handleIdTodoLoading([0]);
-    try {
-      const response = await addTodos(newTodo);
-
-      setInputText('');
-
-      newTodo.id = response.id;
-    } catch (error) {
-      handleError(ErrorMessages.Add);
-      console.error('Error adding todo:', error);
-      setTimeout(() => {
-        handleError(ErrorMessages.WithoutError);
-      }, 3000);
-    } finally {
-      handleSetLoading(false);
-      hanleDeleteTempTodo();
-      handleIdTodoLoading([]);
-    }
-
-    handleAddTodo(newTodo);
-
-    inputRef.current?.focus();
-  };
+  const { inputText, setInputText, handleSubmit } = useAddTodo(
+    handleAddTodo,
+    handleError,
+    handleIdTodoLoading,
+    handleSetLoading,
+    hanleActivateTempTodo,
+    hanleDeleteTempTodo,
+  );
 
   useEffect(() => {
     inputRef.current.focus();
-  }, []);
-
-  useEffect(() => {
-    if (!inputRef.current) {
-      return;
-    }
-
-    if (!isLoading) {
-      inputRef.current.focus();
-    }
-  }, [isLoading]);
+  }, [inputRef, isLoading]);
 
   return (
     <header className="todoapp__header">
@@ -105,7 +55,7 @@ export const TodoHeader: React.FC<Props> = ({
         />
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={event => handleSubmit(event, inputRef)}>
         <input
           ref={inputRef}
           data-cy="NewTodoField"
@@ -113,7 +63,7 @@ export const TodoHeader: React.FC<Props> = ({
           value={inputText}
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
-          onChange={event => setInputText(event.target.value)}
+          onChange={e => setInputText(e.target.value)}
           disabled={isLoading}
         />
       </form>

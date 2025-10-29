@@ -1,23 +1,23 @@
-import { Dispatch, RefObject, SetStateAction } from 'react';
-import { ErrorMessages, Todo, USER_ID } from '../types';
+// hooks/useAddTodo.ts
+import { useState } from 'react';
 import { addTodos } from '../api/todos';
+import { ErrorMessages, Todo, USER_ID } from '../types';
 
-type Props = {
-  setCurrentError: Dispatch<SetStateAction<ErrorMessages | ''>>;
-  setTodoIdLoading: number[];
-  setTempTodo: Todo;
-  inputRef: RefObject<HTMLInputElement>;
-};
-
-const useAddTodo: React.FC<Props> = (
-  setCurrentError,
-  setTodoIdLoading,
-  setTempTodo,
-  inputRef,
+export const useAddTodo = (
+  handleAddTodo: (todo: Todo) => void,
+  handleError: (error: ErrorMessages) => void,
+  handleIdTodoLoading: (id: number[]) => void,
+  handleSetLoading: (loading: boolean) => void,
+  hanleActivateTempTodo: (todo: Todo) => void,
+  hanleDeleteTempTodo: () => void,
 ) => {
-  const handleAddTodo = async (title, setInputText: (text: string) => void) => {
-    if (title.trim() === '') {
-      setCurrentError(ErrorMessages.EmptyTitle);
+  const [inputText, setInputText] = useState('');
+
+  const handleSubmit = async (event, inputRef) => {
+    event.preventDefault();
+
+    if (!inputText.trim()) {
+      handleError(ErrorMessages.EmptyTitle);
 
       return;
     }
@@ -25,27 +25,34 @@ const useAddTodo: React.FC<Props> = (
     const newTodo: Todo = {
       id: 0,
       userId: USER_ID,
-      title: title,
+      title: inputText.trim(),
       completed: false,
     };
 
-    setTodoIdLoading(prev => [...prev], newTodo.id);
-    setTempTodo(newTodo);
+    handleSetLoading(true);
+    hanleActivateTempTodo(newTodo);
+    handleIdTodoLoading([0]);
 
     try {
       const response = await addTodos(newTodo);
 
       setInputText('');
-
       newTodo.id = response.id;
-    } catch (error) {
-      setCurrentError(ErrorMessages.Add);
-      setTempTodo(null);
+      handleAddTodo(newTodo);
+    } catch {
+      handleError(ErrorMessages.Add);
+      setTimeout(() => handleError(ErrorMessages.WithoutError), 3000);
     } finally {
-      setTodoIdLoading(prev => prev.filter(id => id !== newTodo.id));
-      if (!inputRef.current && !inputRef.current.disabled) {
-        inputRef.current.focus();
-      }
+      handleSetLoading(false);
+      hanleDeleteTempTodo();
+      handleIdTodoLoading([]);
+      inputRef.current?.focus();
     }
+  };
+
+  return {
+    inputText,
+    setInputText,
+    handleSubmit,
   };
 };
