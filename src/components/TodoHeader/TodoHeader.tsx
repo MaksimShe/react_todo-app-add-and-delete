@@ -5,6 +5,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { addTodos } from '../../api/todos';
 
+//i will refactor this piece of shit
+
 type Props = {
   quantityActiveTasks: number;
   todos: Todo[];
