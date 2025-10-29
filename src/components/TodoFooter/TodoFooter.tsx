@@ -1,22 +1,40 @@
 import cn from 'classnames';
-import { FilterStatus, Todo } from '../../types';
+import { ErrorMessages, FilterStatus, Todo } from '../../types';
 import * as React from 'react';
+import { useDeleteTodos } from '../../hooks/useDeleteTodo';
+import { Dispatch, SetStateAction } from 'react';
 
 type Props = {
-  todos: Todo[];
+  filteredTodos: Todo[];
   quantityActiveTasks: number;
+  inputRef;
   activeFilterStatus: string;
+
   handleChangeFilter: (type: FilterStatus) => void;
-  handleDeleteAllTodos: () => void;
+  handleSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  handleSetError: (error: ErrorMessages) => void;
+  handleSetTodoIdLoading: Dispatch<SetStateAction<number[]>>;
 };
 
 export const TodoFooter: React.FC<Props> = ({
-  todos,
-  quantityActiveTasks,
+  filteredTodos,
   activeFilterStatus,
+  inputRef,
+  quantityActiveTasks,
+
   handleChangeFilter,
-  handleDeleteAllTodos,
+  handleSetPreparedTodos,
+  handleSetError,
+  handleSetTodoIdLoading,
 }) => {
+  const { handleDeleteAllCompletedTodos } = useDeleteTodos({
+    filteredTodos,
+    inputRef,
+    handleSetPreparedTodos,
+    handleSetError,
+    handleSetTodoIdLoading,
+  });
+
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
@@ -62,8 +80,8 @@ export const TodoFooter: React.FC<Props> = ({
         type="button"
         className="todoapp__clear-completed"
         data-cy="ClearCompletedButton"
-        disabled={quantityActiveTasks === todos.length}
-        onClick={() => handleDeleteAllTodos()}
+        disabled={quantityActiveTasks === filteredTodos.length}
+        onClick={handleDeleteAllCompletedTodos}
       >
         Clear completed
       </button>

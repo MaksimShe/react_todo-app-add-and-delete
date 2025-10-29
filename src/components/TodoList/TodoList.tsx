@@ -7,27 +7,33 @@ import { useDeleteTodos } from '../../hooks/useDeleteTodo';
 
 type Props = {
   filteredTodos: Todo[];
-  handleCheckTodo: (id: number) => void;
   todoIdLoading: number[];
-  handleSetIdLoading: (id: number[]) => void;
+  inputRef;
+
+  handleCheckTodo: (id: number) => void;
+  handleSetTodoIdLoading: (id: number[]) => void;
   handleSetError(error: ErrorMessages);
-  handlePreparedTodos: (todos: Todo[]) => void;
+  handleSetPreparedTodos: (todos: Todo[]) => void;
 };
 
 export const TodoList: React.FC<Props> = ({
   filteredTodos, //use
   todoIdLoading, //jsx
+  inputRef, //use
+
   handleCheckTodo, //jsx
-  handleSetIdLoading, //use
+  handleSetTodoIdLoading, //use
   handleSetError, //use
-  handlePreparedTodos, //use
+  handleSetPreparedTodos, //use
 }) => {
-  const { handleDeleteTodos } = useDeleteTodos(
-    handlePreparedTodos, //setPreparedTodos
-    handleSetError, // setCurrentError
-    handleSetIdLoading, //setTodoIdLoad
-    filteredTodos, //todos
-  );
+  const { handleDeleteTodos } = useDeleteTodos({
+    filteredTodos,
+    inputRef,
+
+    handleSetPreparedTodos,
+    handleSetError,
+    handleSetTodoIdLoading,
+  });
 
   return (
     <section className="todoapp__main" data-cy="TodoList">

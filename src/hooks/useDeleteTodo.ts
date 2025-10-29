@@ -2,12 +2,23 @@ import { Dispatch, SetStateAction } from 'react';
 import { deleteTodos } from '../api/todos';
 import { ErrorMessages, Todo } from '../types';
 
-export const useDeleteTodos = (
-  handleSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>,
-  handleSetCurrentError: (error: ErrorMessages) => void,
-  handleSetTodoIdLoading: Dispatch<SetStateAction<number[]>>,
-  filteredTodos: Todo[],
-) => {
+type Props = {
+  filteredTodos: Todo[];
+  inputRef;
+
+  handleSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  handleSetError: (error: ErrorMessages) => void;
+  handleSetTodoIdLoading: Dispatch<SetStateAction<number[]>>;
+};
+
+export const useDeleteTodos = ({
+  filteredTodos,
+  inputRef,
+
+  handleSetPreparedTodos,
+  handleSetError,
+  handleSetTodoIdLoading,
+}: Props) => {
   const completedTodos = filteredTodos.filter(todo => todo.completed);
 
   const handleDeleteTodos = async (id: number) => {
@@ -16,12 +27,13 @@ export const useDeleteTodos = (
       await deleteTodos(id);
       handleSetPreparedTodos(prev => prev.filter(todo => todo.id !== id));
     } catch (err) {
-      handleSetCurrentError(ErrorMessages.Delete);
+      handleSetError(ErrorMessages.Delete);
       setTimeout(() => {
-        handleSetCurrentError(ErrorMessages.WithoutError);
+        handleSetError(ErrorMessages.WithoutError);
       }, 3000);
     } finally {
       handleSetTodoIdLoading([]);
+      inputRef.current?.focus();
     }
   };
 
@@ -46,14 +58,12 @@ export const useDeleteTodos = (
       const hasError = results.some(r => r.status === 'rejected');
 
       if (hasError) {
-        handleSetCurrentError(ErrorMessages.Delete);
-        setTimeout(
-          () => handleSetCurrentError(ErrorMessages.WithoutError),
-          3000,
-        );
+        handleSetError(ErrorMessages.Delete);
+        setTimeout(() => handleSetError(ErrorMessages.WithoutError), 3000);
       }
     } finally {
       handleSetTodoIdLoading([]);
+      inputRef.current?.focus();
     }
   };
 

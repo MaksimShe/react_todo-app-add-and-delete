@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { UserWarning } from './UserWarning';
-import { deleteTodos, getTodos } from './api/todos';
+import { getTodos } from './api/todos';
 import { FilterStatus, ErrorMessages } from './types';
 import { Todo, USER_ID } from './types';
 import { TodoHeader } from './components/TodoHeader';
@@ -22,7 +22,7 @@ export const App: React.FC = () => {
   const [currentError, setCurrentError] = useState<ErrorMessages>(
     ErrorMessages.WithoutError,
   );
-  const inputRef = useRef<HTMLInputElement>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadTodos = async () => {
@@ -60,37 +60,6 @@ export const App: React.FC = () => {
       .length;
   };
 
-  const deleteAllCompletedTodos = async () => {
-    const completedTodos = preparedTodos.filter(todo => todo.completed);
-    const completedIds = completedTodos.map(todo => todo.id);
-
-    setIdTodoLoading(completedIds);
-
-    try {
-      const results = await Promise.allSettled(
-        completedTodos.map(todo => deleteTodos(todo.id)),
-      );
-
-      const successfulIds = completedIds.filter(
-        (_, index) => results[index].status === 'fulfilled',
-      );
-
-      setPreparedTodos(prev =>
-        prev.filter(todo => !successfulIds.includes(todo.id)),
-      );
-
-      const hasError = results.some(r => r.status === 'rejected');
-
-      if (hasError) {
-        setCurrentError(ErrorMessages.Delete);
-        setTimeout(() => setCurrentError(ErrorMessages.WithoutError), 3000);
-      }
-    } finally {
-      setIdTodoLoading([]);
-      inputRef.current?.focus();
-    }
-  };
-
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
@@ -110,19 +79,23 @@ export const App: React.FC = () => {
         <TodoList
           filteredTodos={filteredTodos}
           todoIdLoading={idTodoLoading}
+          inputRef={inputRef}
           handleCheckTodo={handleCheckTodo}
-          handleSetIdLoading={setIdTodoLoading}
+          handleSetTodoIdLoading={setIdTodoLoading}
           handleSetError={setCurrentError}
-          handlePreparedTodos={setPreparedTodos}
+          handleSetPreparedTodos={setPreparedTodos}
         />
 
         {preparedTodos.length > 0 && (
           <TodoFooter
-            todos={preparedTodos}
-            quantityActiveTasks={quantityActiveTasks()}
+            filteredTodos={preparedTodos}
             activeFilterStatus={activeFilterStatus}
+            inputRef={inputRef}
+            quantityActiveTasks={quantityActiveTasks()}
             handleChangeFilter={setActiveFilterStatus}
-            handleDeleteAllTodos={() => deleteAllCompletedTodos()}
+            handleSetPreparedTodos={setPreparedTodos}
+            handleSetError={setCurrentError}
+            handleSetTodoIdLoading={setIdTodoLoading}
           />
         )}
       </div>
