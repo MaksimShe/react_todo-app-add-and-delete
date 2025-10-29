@@ -133,17 +133,16 @@ export const App: React.FC = () => {
           hanleActivateTempTodo={activateTempTodo}
           hanleDeleteTempTodo={deleteTempTodo}
           inputRef={inputRef}
+          handlePreparedTodos={setPreparedTodos}
         />
 
         <TodoList
           filteredTodos={filteredTodos}
           handleCheckTodo={handleCheckTodo}
-          isLoading={isLoading}
-          handleLoading={setIsLoading}
-          deleteTodo={deleteTodoOnScreen}
           idTodoLoading={idTodoLoading}
           handleSetIdLoading={setIdTodoLoading}
           handleError={setCurrentError}
+          handlePreparedTodos={setPreparedTodos}
         />
 
         {preparedTodos.length > 0 && (

@@ -15,6 +15,7 @@ type Props = {
   handleSetLoading: (loading: boolean) => void;
   hanleActivateTempTodo: (todo: Todo) => void;
   hanleDeleteTempTodo: () => void;
+  handlePreparedTodos: (todos: Todo[]) => void;
   inputRef;
 };
 
@@ -27,16 +28,17 @@ export const TodoHeader: React.FC<Props> = ({
   handleIdTodoLoading,
   handleSetLoading,
   hanleActivateTempTodo,
-  hanleDeleteTempTodo,
+  handlePreparedTodos,
   inputRef,
 }) => {
   const { inputText, setInputText, handleSubmit } = useAddTodo(
+    todos,
     handleAddTodo,
     handleError,
     handleIdTodoLoading,
     handleSetLoading,
     hanleActivateTempTodo,
-    hanleDeleteTempTodo,
+    handlePreparedTodos,
   );
 
   useEffect(() => {

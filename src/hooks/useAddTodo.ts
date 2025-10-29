@@ -1,15 +1,15 @@
-// hooks/useAddTodo.ts
 import { useState } from 'react';
 import { addTodos } from '../api/todos';
 import { ErrorMessages, Todo, USER_ID } from '../types';
 
 export const useAddTodo = (
+  preparedTodos: Todo[],
   handleAddTodo: (todo: Todo) => void,
   handleError: (error: ErrorMessages) => void,
   handleIdTodoLoading: (id: number[]) => void,
-  handleSetLoading: (loading: boolean) => void,
-  hanleActivateTempTodo: (todo: Todo) => void,
-  hanleDeleteTempTodo: () => void,
+  handleSetDisableInput: (loading: boolean) => void,
+  handleTempTodo: (todo: Todo) => void,
+  handlePreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>,
 ) => {
   const [inputText, setInputText] = useState('');
 
@@ -29,8 +29,8 @@ export const useAddTodo = (
       completed: false,
     };
 
-    handleSetLoading(true);
-    hanleActivateTempTodo(newTodo);
+    handleSetDisableInput(true);
+    handleTempTodo(newTodo);
     handleIdTodoLoading([0]);
 
     try {
@@ -43,9 +43,10 @@ export const useAddTodo = (
       handleError(ErrorMessages.Add);
       setTimeout(() => handleError(ErrorMessages.WithoutError), 3000);
     } finally {
-      handleSetLoading(false);
-      hanleDeleteTempTodo();
+      handleSetDisableInput(false);
+      handleTempTodo(null);
       handleIdTodoLoading([]);
+      handlePreparedTodos(prev => prev.filter(i => i.id !== 0));
       inputRef.current?.focus();
     }
   };

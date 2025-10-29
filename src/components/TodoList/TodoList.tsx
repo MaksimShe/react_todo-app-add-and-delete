@@ -3,45 +3,31 @@
 import { ErrorMessages, Todo } from '../../types';
 import cn from 'classnames';
 import * as React from 'react';
-import { deleteTodos } from '../../api/todos';
+import { useDeleteTodos } from '../../hooks/useDeleteTodo';
 
 type Props = {
   filteredTodos: Todo[];
   handleCheckTodo: (id: number) => void;
-  isLoading: boolean;
-  handleLoading: (loading: boolean) => void;
-  deleteTodo: (id: number) => void;
   idTodoLoading: number[];
   handleSetIdLoading: (id: number[]) => void;
   handleError(error: ErrorMessages);
+  handlePreparedTodos: (todos: Todo[]) => void;
 };
 
 export const TodoList: React.FC<Props> = ({
   filteredTodos,
   handleCheckTodo,
-  handleLoading,
-  deleteTodo,
   idTodoLoading,
   handleSetIdLoading,
   handleError,
+  handlePreparedTodos,
 }) => {
-  const handleDeleteTodo = async (id: number) => {
-    try {
-      handleLoading(true);
-      handleSetIdLoading([id]);
-      await deleteTodos(id);
-      deleteTodo(id);
-    } catch (err) {
-      handleError(ErrorMessages.Delete);
-      console.error('Failed to delete todo', err);
-      setTimeout(() => {
-        handleError(ErrorMessages.WithoutError);
-      }, 3000);
-    } finally {
-      handleLoading(false);
-      handleSetIdLoading([]);
-    }
-  };
+  const { handleDeleteTodos } = useDeleteTodos(
+    handlePreparedTodos, //setPreparedTodos
+    handleError, // setCurrentError
+    handleSetIdLoading, //setTodoIdLoad
+    filteredTodos, //todos
+  );
 
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -71,7 +57,7 @@ export const TodoList: React.FC<Props> = ({
               type="button"
               className="todo__remove"
               data-cy="TodoDelete"
-              onClick={() => handleDeleteTodo(todo.id)}
+              onClick={() => handleDeleteTodos(todo.id)}
             >
               ×
             </button>
