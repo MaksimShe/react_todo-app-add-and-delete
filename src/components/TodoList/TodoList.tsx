@@ -11,8 +11,8 @@ type Props = {
   isLoading: boolean;
   handleLoading: (loading: boolean) => void;
   deleteTodo: (id: number) => void;
-  idTodoLoading: number;
-  handleSetIdLoading: (id: number) => void;
+  idTodoLoading: number[];
+  handleSetIdLoading: (id: number[]) => void;
   handleError(error: ErrorMessages);
 };
 
@@ -28,7 +28,7 @@ export const TodoList: React.FC<Props> = ({
   const handleDeleteTodo = async (id: number) => {
     try {
       handleLoading(true);
-      handleSetIdLoading(id);
+      handleSetIdLoading([id]);
       await deleteTodos(id);
       deleteTodo(id);
     } catch (err) {
@@ -39,7 +39,7 @@ export const TodoList: React.FC<Props> = ({
       }, 3000);
     } finally {
       handleLoading(false);
-      handleSetIdLoading(-1);
+      handleSetIdLoading([]);
     }
   };
 
@@ -80,7 +80,7 @@ export const TodoList: React.FC<Props> = ({
             <div
               data-cy="TodoLoader"
               className={cn('modal overlay', {
-                'is-active': idTodoLoading === todo.id,
+                'is-active': idTodoLoading.includes(todo.id),
               })}
             >
               <div className="modal-background has-background-white-ter" />

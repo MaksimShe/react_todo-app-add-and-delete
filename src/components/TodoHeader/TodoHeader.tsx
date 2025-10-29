@@ -2,7 +2,7 @@
 import cn from 'classnames';
 import { ErrorMessages, Todo, USER_ID } from '../../types';
 import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { addTodos } from '../../api/todos';
 
 type Props = {
@@ -12,10 +12,11 @@ type Props = {
   handleAddTodo: (todo: Todo) => void;
   handleError: (error: ErrorMessages) => void;
   isLoading: boolean;
-  handleIdTodoLoading: (id: number) => void;
+  handleIdTodoLoading: (id: number[]) => void;
   handleSetLoading: (loading: boolean) => void;
   hanleActivateTempTodo: (todo: Todo) => void;
   hanleDeleteTempTodo: () => void;
+  inputRef;
 };
 
 export const TodoHeader: React.FC<Props> = ({
@@ -28,8 +29,8 @@ export const TodoHeader: React.FC<Props> = ({
   handleSetLoading,
   hanleActivateTempTodo,
   hanleDeleteTempTodo,
+  inputRef,
 }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [inputText, setInputText] = useState<string>('');
 
   const handleSubmit = async event => {
@@ -52,7 +53,7 @@ export const TodoHeader: React.FC<Props> = ({
 
     handleSetLoading(true);
     hanleActivateTempTodo(newTodo);
-    handleIdTodoLoading(0);
+    handleIdTodoLoading([0]);
     try {
       const response = await addTodos(newTodo);
 
@@ -68,7 +69,7 @@ export const TodoHeader: React.FC<Props> = ({
     } finally {
       handleSetLoading(false);
       hanleDeleteTempTodo();
-      handleIdTodoLoading(-1);
+      handleIdTodoLoading([]);
     }
 
     handleAddTodo(newTodo);
