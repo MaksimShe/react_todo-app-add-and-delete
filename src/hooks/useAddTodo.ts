@@ -3,12 +3,9 @@ import { addTodos } from '../api/todos';
 import { ErrorMessages, Todo, USER_ID } from '../types';
 
 export const useAddTodo = (
-  preparedTodos: Todo[],
-  handleAddTodo: (todo: Todo) => void,
   handleError: (error: ErrorMessages) => void,
   handleIdTodoLoading: (id: number[]) => void,
   handleSetDisableInput: (loading: boolean) => void,
-  handleTempTodo: (todo: Todo) => void,
   handlePreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>,
 ) => {
   const [inputText, setInputText] = useState('');
@@ -30,7 +27,7 @@ export const useAddTodo = (
     };
 
     handleSetDisableInput(true);
-    handleTempTodo(newTodo);
+    handlePreparedTodos(prev => [...prev, { ...newTodo, id: 0 }]); //create temp todo
     handleIdTodoLoading([0]);
 
     try {
@@ -38,15 +35,14 @@ export const useAddTodo = (
 
       setInputText('');
       newTodo.id = response.id;
-      handleAddTodo(newTodo);
+      handlePreparedTodos(prev => [...prev, { ...newTodo }]); //add newTodo in list
     } catch {
       handleError(ErrorMessages.Add);
       setTimeout(() => handleError(ErrorMessages.WithoutError), 3000);
     } finally {
       handleSetDisableInput(false);
-      handleTempTodo(null);
       handleIdTodoLoading([]);
-      handlePreparedTodos(prev => prev.filter(i => i.id !== 0));
+      handlePreparedTodos(prev => prev.filter(i => i.id !== 0)); //delete temp todo
       inputRef.current?.focus();
     }
   };

@@ -6,38 +6,30 @@ import { useAddTodo } from '../../hooks/useAddTodo';
 
 type Props = {
   quantityActiveTasks: number;
-  todos: Todo[];
+  preparedTodos: Todo[];
   loadingTodos: number[];
-  handleAddTodo: (todo: Todo) => void;
   handleError: (error: ErrorMessages) => void;
   isLoading: boolean;
   handleIdTodoLoading: (id: number[]) => void;
   handleSetLoading: (loading: boolean) => void;
-  hanleActivateTempTodo: (todo: Todo) => void;
-  hanleDeleteTempTodo: () => void;
   handlePreparedTodos: (todos: Todo[]) => void;
   inputRef;
 };
 
 export const TodoHeader: React.FC<Props> = ({
   quantityActiveTasks,
-  todos,
-  handleAddTodo,
+  preparedTodos,
   handleError,
   isLoading,
   handleIdTodoLoading,
   handleSetLoading,
-  hanleActivateTempTodo,
   handlePreparedTodos,
   inputRef,
 }) => {
   const { inputText, setInputText, handleSubmit } = useAddTodo(
-    todos,
-    handleAddTodo,
     handleError,
     handleIdTodoLoading,
     handleSetLoading,
-    hanleActivateTempTodo,
     handlePreparedTodos,
   );
 
@@ -47,7 +39,7 @@ export const TodoHeader: React.FC<Props> = ({
 
   return (
     <header className="todoapp__header">
-      {todos.length > 0 && (
+      {preparedTodos.length > 0 && (
         <button
           type="button"
           className={cn('todoapp__toggle-all', {

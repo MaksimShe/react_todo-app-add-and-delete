@@ -50,22 +50,6 @@ export const App: React.FC = () => {
     return <UserWarning />;
   }
 
-  const activateTempTodo = tempTodo => {
-    setPreparedTodos(prev => [...prev, { ...tempTodo, id: 0 }]);
-  };
-
-  const deleteTempTodo = () => {
-    setPreparedTodos(prev => prev.filter(todo => todo.id !== 0));
-  };
-
-  const addTodoOnScreen = (todo: Todo) => {
-    setPreparedTodos(prev => [...prev, { ...todo }]);
-  };
-
-  const deleteTodoOnScreen = (id: number) => {
-    setPreparedTodos(prev => prev.filter(todo => todo.id !== id));
-  };
-
   const filteredTodos = filterTodos(preparedTodos, activeFilterStatus);
 
   const handleChangeFilter = (type: FilterStatus) => {
@@ -123,15 +107,12 @@ export const App: React.FC = () => {
       <div className="todoapp__content">
         <TodoHeader
           quantityActiveTasks={quantityActiveTasks()}
-          todos={preparedTodos}
+          preparedTodos={preparedTodos}
           loadingTodos={[]}
-          handleAddTodo={addTodoOnScreen}
           handleError={setCurrentError}
           isLoading={isLoading}
           handleIdTodoLoading={setIdTodoLoading}
           handleSetLoading={setIsLoading}
-          hanleActivateTempTodo={activateTempTodo}
-          hanleDeleteTempTodo={deleteTempTodo}
           inputRef={inputRef}
           handlePreparedTodos={setPreparedTodos}
         />
