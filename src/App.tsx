@@ -13,7 +13,7 @@ import { filterTodos } from './utils/fiterTodos';
 import { ErrorNotification } from './components/ErrorNotification';
 
 export const App: React.FC = () => {
-  const [isDisabledInput, setDisableInput] = useState<boolean>(null);
+  const [isDisabledInput, setDisableInput] = useState<boolean>(false);
   const [idTodoLoading, setIdTodoLoading] = useState<number[]>([]);
   const [preparedTodos, setPreparedTodos] = useState<Todo[]>([]);
   const [activeFilterStatus, setActiveFilterStatus] = useState<FilterStatus>(
@@ -55,10 +55,9 @@ export const App: React.FC = () => {
     );
   };
 
-  const quantityActiveTasks = (): number => {
-    return preparedTodos.filter(todo => !todo.completed && todo.id !== 0)
-      .length;
-  };
+  const quantityActiveTasks = preparedTodos.filter(
+    todo => !todo.completed && todo.id !== 0,
+  ).length;
 
   return (
     <div className="todoapp">
@@ -66,24 +65,24 @@ export const App: React.FC = () => {
 
       <div className="todoapp__content">
         <TodoHeader
-          quantityActiveTasks={quantityActiveTasks()}
+          quantityActiveTasks={quantityActiveTasks}
           preparedTodos={preparedTodos}
           isDisabledInput={isDisabledInput}
           inputRef={inputRef}
-          handleError={setCurrentError}
-          handleIdTodoLoading={setIdTodoLoading}
-          handleSetDisableInput={setDisableInput}
-          handlePreparedTodos={setPreparedTodos}
+          onSetError={setCurrentError}
+          onSetIdTodoLoading={setIdTodoLoading}
+          onSetDisableInput={setDisableInput}
+          onSetPreparedTodos={setPreparedTodos}
         />
 
         <TodoList
           filteredTodos={filteredTodos}
           todoIdLoading={idTodoLoading}
           inputRef={inputRef}
-          handleCheckTodo={handleCheckTodo}
-          handleSetTodoIdLoading={setIdTodoLoading}
-          handleSetError={setCurrentError}
-          handleSetPreparedTodos={setPreparedTodos}
+          onCheckTodo={handleCheckTodo}
+          onSetTodoIdLoading={setIdTodoLoading}
+          onSetError={setCurrentError}
+          onSetPreparedTodos={setPreparedTodos}
         />
 
         {preparedTodos.length > 0 && (
@@ -91,18 +90,18 @@ export const App: React.FC = () => {
             filteredTodos={preparedTodos}
             activeFilterStatus={activeFilterStatus}
             inputRef={inputRef}
-            quantityActiveTasks={quantityActiveTasks()}
-            handleChangeFilter={setActiveFilterStatus}
-            handleSetPreparedTodos={setPreparedTodos}
-            handleSetError={setCurrentError}
-            handleSetTodoIdLoading={setIdTodoLoading}
+            quantityActiveTasks={quantityActiveTasks}
+            onChangeFilter={setActiveFilterStatus}
+            onSetPreparedTodos={setPreparedTodos}
+            onSetError={setCurrentError}
+            onSetTodoIdLoading={setIdTodoLoading}
           />
         )}
       </div>
 
       <ErrorNotification
         currentError={currentError}
-        handleError={setCurrentError}
+        onSetError={setCurrentError}
       />
     </div>
   );

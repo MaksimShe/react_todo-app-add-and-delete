@@ -1,38 +1,38 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction } from 'react';
 import { deleteTodos } from '../api/todos';
 import { ErrorMessages, Todo } from '../types';
 
 type Props = {
   filteredTodos: Todo[];
-  inputRef;
+  inputRef: RefObject<HTMLInputElement>;
 
-  handleSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-  handleSetError: (error: ErrorMessages) => void;
-  handleSetTodoIdLoading: Dispatch<SetStateAction<number[]>>;
+  onSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  onSetError: (error: ErrorMessages) => void;
+  onSetTodoIdLoading: Dispatch<SetStateAction<number[]>>;
 };
 
 export const useDeleteTodos = ({
   filteredTodos,
   inputRef,
 
-  handleSetPreparedTodos,
-  handleSetError,
-  handleSetTodoIdLoading,
+  onSetPreparedTodos,
+  onSetError,
+  onSetTodoIdLoading,
 }: Props) => {
   const completedTodos = filteredTodos.filter(todo => todo.completed);
 
   const handleDeleteTodos = async (id: number) => {
     try {
-      handleSetTodoIdLoading([id]);
+      onSetTodoIdLoading([id]);
       await deleteTodos(id);
-      handleSetPreparedTodos(prev => prev.filter(todo => todo.id !== id));
+      onSetPreparedTodos(prev => prev.filter(todo => todo.id !== id));
     } catch (err) {
-      handleSetError(ErrorMessages.Delete);
+      onSetError(ErrorMessages.Delete);
       setTimeout(() => {
-        handleSetError(ErrorMessages.WithoutError);
+        onSetError(ErrorMessages.WithoutError);
       }, 3000);
     } finally {
-      handleSetTodoIdLoading([]);
+      onSetTodoIdLoading([]);
       inputRef.current?.focus();
     }
   };
@@ -40,7 +40,7 @@ export const useDeleteTodos = ({
   const handleDeleteAllCompletedTodos = async () => {
     const completedIds = completedTodos.map(todo => todo.id);
 
-    handleSetTodoIdLoading(completedIds);
+    onSetTodoIdLoading(completedIds);
 
     try {
       const results = await Promise.allSettled(
@@ -51,18 +51,18 @@ export const useDeleteTodos = ({
         (_, index) => results[index].status === 'fulfilled',
       );
 
-      handleSetPreparedTodos(prev =>
+      onSetPreparedTodos(prev =>
         prev.filter(todo => !successfulIds.includes(todo.id)),
       );
 
       const hasError = results.some(r => r.status === 'rejected');
 
       if (hasError) {
-        handleSetError(ErrorMessages.Delete);
-        setTimeout(() => handleSetError(ErrorMessages.WithoutError), 3000);
+        onSetError(ErrorMessages.Delete);
+        setTimeout(() => onSetError(ErrorMessages.WithoutError), 3000);
       }
     } finally {
-      handleSetTodoIdLoading([]);
+      onSetTodoIdLoading([]);
       inputRef.current?.focus();
     }
   };

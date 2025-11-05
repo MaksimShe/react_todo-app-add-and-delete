@@ -8,31 +8,31 @@ import { useDeleteTodos } from '../../hooks/useDeleteTodo';
 type Props = {
   filteredTodos: Todo[];
   todoIdLoading: number[];
-  inputRef;
+  inputRef: React.RefObject<HTMLInputElement>;
 
-  handleCheckTodo: (id: number) => void;
-  handleSetTodoIdLoading: (id: number[]) => void;
-  handleSetError(error: ErrorMessages);
-  handleSetPreparedTodos: (todos: Todo[]) => void;
+  onCheckTodo: (id: number) => void;
+  onSetTodoIdLoading: React.Dispatch<React.SetStateAction<number[]>>;
+  onSetError: (error: ErrorMessages) => void;
+  onSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 };
 
 export const TodoList: React.FC<Props> = ({
-  filteredTodos, //use
-  todoIdLoading, //jsx
-  inputRef, //use
+  filteredTodos,
+  todoIdLoading,
+  inputRef,
 
-  handleCheckTodo, //jsx
-  handleSetTodoIdLoading, //use
-  handleSetError, //use
-  handleSetPreparedTodos, //use
+  onCheckTodo,
+  onSetTodoIdLoading,
+  onSetError,
+  onSetPreparedTodos,
 }) => {
   const { handleDeleteTodos } = useDeleteTodos({
     filteredTodos,
     inputRef,
 
-    handleSetPreparedTodos,
-    handleSetError,
-    handleSetTodoIdLoading,
+    onSetPreparedTodos,
+    onSetError,
+    onSetTodoIdLoading,
   });
 
   return (
@@ -50,7 +50,7 @@ export const TodoList: React.FC<Props> = ({
                 type="checkbox"
                 className="todo__status"
                 checked={todo.completed}
-                onChange={() => handleCheckTodo(todo.id)}
+                onChange={() => onCheckTodo(todo.id)}
               />
             </label>
 

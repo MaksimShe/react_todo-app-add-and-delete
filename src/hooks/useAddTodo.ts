@@ -1,27 +1,30 @@
-import { useState } from 'react';
+import { RefObject, useState } from 'react';
 import { addTodos } from '../api/todos';
 import { ErrorMessages, Todo, USER_ID } from '../types';
 
 type Props = {
-  handleError: (error: ErrorMessages) => void;
-  handleIdTodoLoading: (id: number[]) => void;
-  handleSetDisableInput: (loading: boolean) => void;
-  handlePreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  onSetError: (error: ErrorMessages) => void;
+  onSetIdTodoLoading: (id: number[]) => void;
+  onSetDisableInput: (loading: boolean) => void;
+  onSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 };
 
 export const useAddTodo = ({
-  handleError,
-  handleIdTodoLoading,
-  handleSetDisableInput,
-  handlePreparedTodos,
+  onSetError,
+  onSetIdTodoLoading,
+  onSetDisableInput,
+  onSetPreparedTodos,
 }: Props) => {
   const [inputText, setInputText] = useState('');
 
-  const handleSubmit = async (event, inputRef) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+    inputRef: RefObject<HTMLInputElement>,
+  ) => {
     event.preventDefault();
 
     if (!inputText.trim()) {
-      handleError(ErrorMessages.EmptyTitle);
+      onSetError(ErrorMessages.EmptyTitle);
 
       return;
     }
@@ -33,22 +36,22 @@ export const useAddTodo = ({
       completed: false,
     };
 
-    handleSetDisableInput(true);
-    handlePreparedTodos(prev => [...prev, { ...newTodo, id: 0 }]); //create temp todo
-    handleIdTodoLoading([0]);
+    onSetDisableInput(true);
+    onSetPreparedTodos(prev => [...prev, { ...newTodo, id: 0 }]); //create temp todo
+    onSetIdTodoLoading([0]);
 
     try {
       const response = await addTodos(newTodo);
 
       setInputText('');
       newTodo.id = response.id;
-      handlePreparedTodos(prev => [...prev, { ...newTodo }]); //add newTodo in list
+      onSetPreparedTodos(prev => [...prev, { ...newTodo }]); //add newTodo in list
     } catch {
-      handleError(ErrorMessages.Add);
+      onSetError(ErrorMessages.Add);
     } finally {
-      handleSetDisableInput(false);
-      handleIdTodoLoading([]);
-      handlePreparedTodos(prev => prev.filter(i => i.id !== 0)); //delete temp todo
+      onSetDisableInput(false);
+      onSetIdTodoLoading([]);
+      onSetPreparedTodos(prev => prev.filter(i => i.id !== 0)); //delete temp todo
       inputRef.current?.focus();
     }
   };

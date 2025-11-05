@@ -7,13 +7,13 @@ import { Dispatch, SetStateAction } from 'react';
 type Props = {
   filteredTodos: Todo[];
   quantityActiveTasks: number;
-  inputRef;
+  inputRef: React.RefObject<HTMLInputElement>;
   activeFilterStatus: string;
 
-  handleChangeFilter: (type: FilterStatus) => void;
-  handleSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-  handleSetError: (error: ErrorMessages) => void;
-  handleSetTodoIdLoading: Dispatch<SetStateAction<number[]>>;
+  onChangeFilter: (type: FilterStatus) => void;
+  onSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  onSetError: (error: ErrorMessages) => void;
+  onSetTodoIdLoading: Dispatch<SetStateAction<number[]>>;
 };
 
 export const TodoFooter: React.FC<Props> = ({
@@ -22,17 +22,17 @@ export const TodoFooter: React.FC<Props> = ({
   inputRef,
   quantityActiveTasks,
 
-  handleChangeFilter,
-  handleSetPreparedTodos,
-  handleSetError,
-  handleSetTodoIdLoading,
+  onChangeFilter,
+  onSetPreparedTodos,
+  onSetError,
+  onSetTodoIdLoading,
 }) => {
   const { handleDeleteAllCompletedTodos } = useDeleteTodos({
     filteredTodos,
     inputRef,
-    handleSetPreparedTodos,
-    handleSetError,
-    handleSetTodoIdLoading,
+    onSetPreparedTodos,
+    onSetError,
+    onSetTodoIdLoading,
   });
 
   return (
@@ -48,7 +48,7 @@ export const TodoFooter: React.FC<Props> = ({
             selected: activeFilterStatus === FilterStatus.All,
           })}
           data-cy="FilterLinkAll"
-          onClick={() => handleChangeFilter(FilterStatus.All)}
+          onClick={() => onChangeFilter(FilterStatus.All)}
         >
           All
         </a>
@@ -59,7 +59,7 @@ export const TodoFooter: React.FC<Props> = ({
             selected: activeFilterStatus === FilterStatus.Active,
           })}
           data-cy="FilterLinkActive"
-          onClick={() => handleChangeFilter(FilterStatus.Active)}
+          onClick={() => onChangeFilter(FilterStatus.Active)}
         >
           Active
         </a>
@@ -70,7 +70,7 @@ export const TodoFooter: React.FC<Props> = ({
             selected: activeFilterStatus === FilterStatus.Completed,
           })}
           data-cy="FilterLinkCompleted"
-          onClick={() => handleChangeFilter(FilterStatus.Completed)}
+          onClick={() => onChangeFilter(FilterStatus.Completed)}
         >
           Completed
         </a>

@@ -8,12 +8,12 @@ type Props = {
   quantityActiveTasks: number;
   preparedTodos: Todo[];
   isDisabledInput: boolean;
-  inputRef;
+  inputRef: React.RefObject<HTMLInputElement>;
 
-  handleError: (error: ErrorMessages) => void;
-  handleIdTodoLoading: (id: number[]) => void;
-  handleSetDisableInput: (loading: boolean) => void;
-  handlePreparedTodos: (todos: Todo[]) => void;
+  onSetError: (error: ErrorMessages) => void;
+  onSetIdTodoLoading: (id: number[]) => void;
+  onSetDisableInput: (loading: boolean) => void;
+  onSetPreparedTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 };
 
 export const TodoHeader: React.FC<Props> = ({
@@ -22,21 +22,21 @@ export const TodoHeader: React.FC<Props> = ({
   isDisabledInput,
   inputRef,
 
-  handleError,
-  handleIdTodoLoading,
-  handleSetDisableInput,
-  handlePreparedTodos,
+  onSetError,
+  onSetIdTodoLoading,
+  onSetDisableInput,
+  onSetPreparedTodos,
 }) => {
   const { inputText, setInputText, handleSubmit } = useAddTodo({
-    handleError,
-    handleIdTodoLoading,
-    handleSetDisableInput,
-    handlePreparedTodos,
+    onSetError,
+    onSetIdTodoLoading,
+    onSetDisableInput,
+    onSetPreparedTodos,
   });
 
   useEffect(() => {
-    inputRef.current.focus();
-  }, [inputRef, isDisabledInput]);
+    inputRef.current?.focus();
+  }, [preparedTodos]);
 
   return (
     <header className="todoapp__header">

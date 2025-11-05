@@ -4,15 +4,15 @@ import { ErrorMessages } from '../../types';
 
 type Props = {
   currentError: string | null;
-  handleError: (errorType: ErrorMessages) => void;
+  onSetError: (errorType: ErrorMessages) => void;
 };
 
 export const ErrorNotification: React.FC<Props> = ({
   currentError,
-  handleError,
+  onSetError,
 }) => {
   setTimeout(() => {
-    handleError(ErrorMessages.WithoutError);
+    onSetError(ErrorMessages.WithoutError);
   }, 3000);
 
   return (
@@ -27,7 +27,7 @@ export const ErrorNotification: React.FC<Props> = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={() => handleError(ErrorMessages.WithoutError)}
+        onClick={() => onSetError(ErrorMessages.WithoutError)}
       />
       {currentError}
     </div>
